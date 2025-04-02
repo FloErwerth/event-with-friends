@@ -1,18 +1,14 @@
 {
   "expo": {
-    "name": "my-expo-app",
-    "slug": "my-expo-app",
-    "version": "1.0.0",
+    "name": "Event with Friends",
+    "slug": "event-with-friends",
+    "version": "0.01",
 
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
 
     "experiments": {
       "tsconfigPaths": true
     },
 
-    "plugins": [],
 
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,13 +22,25 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+
       "supportsTablet": true
     },
     "android": {
+      "package": "de.eventee",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
-    }
+    },
+
+
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ]
   }
 }
