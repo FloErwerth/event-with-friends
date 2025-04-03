@@ -1,46 +1,61 @@
 {
   "expo": {
-    "name": "Event with Friends",
-    "slug": "event-with-friends",
+    "name": "PlanBuddy",
+    "slug": "planbuddy",
     "version": "0.01",
-
-
     "experiments": {
       "tsconfigPaths": true
     },
-
-
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-
+      "googleServicesFile": "./google-services.ios.plist",
+      "bundleIdentifier": "de.florian.erwerth.planbuddy",
       "supportsTablet": true
     },
     "android": {
-      "package": "de.eventee",
+      "googleServicesFile": "./google-services.android.json",
+      "package": "de.florian.erwerth.planbuddy",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
-
-
     "plugins": [
       [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ddcf8e81-e61c-4947-81a1-527ddc53e685"
+      }
+    },
+    "owner": "florian_erwerth"
   }
 }

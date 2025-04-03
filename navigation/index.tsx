@@ -1,14 +1,17 @@
+import auth from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'react-native';
 import { defaultTheme, ThemeProvider, ThemeType } from 'react-native-magnus';
 
 import { EventCreation } from '../screens/EventCreation';
+import { LoginScreen } from '../screens/Login/Login';
 import Overview from '../screens/Overview';
 
 export type RootStackParamList = {
   Overview: undefined;
   CreateEvent: undefined;
+  Authentication: undefined;
 };
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -103,13 +106,21 @@ const theme: ThemeType = {
 };
 
 export default function RootStack() {
+  const isAuthenticated = auth().currentUser !== null;
+
   return (
     <NavigationContainer>
       <ThemeProvider theme={theme}>
         <StatusBar />
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Overview">
-          <Stack.Screen name="Overview" component={Overview} />
-          <Stack.Screen name="CreateEvent" component={EventCreation} />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isAuthenticated ? (
+            <>
+              <Stack.Screen name="Overview" component={Overview} />
+              <Stack.Screen name="CreateEvent" component={EventCreation} />
+            </>
+          ) : (
+            <Stack.Screen name="Authentication" component={LoginScreen} />
+          )}
         </Stack.Navigator>
       </ThemeProvider>
     </NavigationContainer>

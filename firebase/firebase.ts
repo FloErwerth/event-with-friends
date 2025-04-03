@@ -1,12 +1,9 @@
-// TODO: Replace the following with your app's Firebase project configuration
-// See: https://support.google.com/firebase/answer/7015592
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import db from '@react-native-firebase/database';
 
-const firebaseConfig = {} as const;
+if (__DEV__) {
+  db().useEmulator('http://127.0.0.1', 9000);
+}
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const firebaseDB = db;
 
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
+export default firebaseDB;
