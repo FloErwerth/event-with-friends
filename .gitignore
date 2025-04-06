@@ -21,3 +21,13 @@ android
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
+/.idea/.gitignore
+/bun.lock
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/jsLinters/eslint.xml
+/.idea/modules.xml
+/.idea/my-expo-app.iml
+/.idea/prettier.xml
+/.idea/codeStyles/Project.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
