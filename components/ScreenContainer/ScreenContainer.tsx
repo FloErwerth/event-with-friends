@@ -1,10 +1,10 @@
-import { useNavigation } from '@react-navigation/native';
-import { ChevronLeft } from 'lucide-react-native';
-import { PropsWithChildren } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
-import { Button, Text } from 'react-native-magnus';
+import { ChevronLeft } from "lucide-react-native";
+import { PropsWithChildren } from "react";
+import { SafeAreaView, StyleSheet } from "react-native";
+import { Button, Text } from "react-native-magnus";
+import { router } from "expo-router";
 
-import { View } from '../View';
+import { View } from "../View";
 
 const styles = StyleSheet.create({
   safeAreaView: {
@@ -18,7 +18,6 @@ type ScreenContainerProps = {
 } & PropsWithChildren;
 
 export const ScreenContainer = ({ children, title, enableGoBack = true }: ScreenContainerProps) => {
-  const { canGoBack, goBack } = useNavigation();
 
   const Header = () => {
     if (!title && !enableGoBack) {
@@ -27,8 +26,8 @@ export const ScreenContainer = ({ children, title, enableGoBack = true }: Screen
 
     return (
       <View p="lg" flexDir="row" alignItems="center" gap={16}>
-        {enableGoBack && canGoBack() && (
-          <Button variant="ghost" p={0} my="auto" onPress={goBack}>
+        {enableGoBack && router.canGoBack() && (
+          <Button variant="ghost" p={0} my="auto" onPress={router.back}>
             <ChevronLeft size={32} />
           </Button>
         )}

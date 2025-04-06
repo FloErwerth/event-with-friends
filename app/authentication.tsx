@@ -1,20 +1,19 @@
+import { useState } from "react";
+import { userOperations } from "../api/firebase";
 import {
   createUserWithEmailAndPassword,
   FirebaseAuthTypes,
   getAuth,
-  signInWithEmailAndPassword,
-} from '@react-native-firebase/auth';
-import db from '@react-native-firebase/database';
-import { useState } from 'react';
-import { Button, Input } from 'react-native-magnus';
-import { z } from 'zod';
-
-import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
-import { View } from '../../components/View';
+  signInWithEmailAndPassword
+} from "@react-native-firebase/auth";
+import { ScreenContainer } from "../components/ScreenContainer/ScreenContainer";
+import { Button, Input } from "react-native-magnus";
+import { View } from "../components/View";
+import { z } from "zod";
 
 const emailSchema = z.string().email().trim();
 
-export const LoginScreen = () => {
+export default function Authentication() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -22,7 +21,12 @@ export const LoginScreen = () => {
     if (!credential.user) {
       throw new Error('User was not created successfully.');
     }
-    await db().ref(`/users/${credential.user.uid}`).set({ email: credential.user.email });
+    userOperations
+      .createUser({
+        id: credential.user.uid,
+        email: credential.user.email ?? undefined,
+      })
+      .catch((e) => console.log(e));
   };
 
   const tryLogin = (email: string, password: string) => {
@@ -66,4 +70,4 @@ export const LoginScreen = () => {
       </View>
     </ScreenContainer>
   );
-};
+}

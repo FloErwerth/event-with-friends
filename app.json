@@ -2,6 +2,7 @@
   "expo": {
     "name": "PlanBuddy",
     "slug": "planbuddy",
+    "scheme": "planbuddy",
     "version": "0.01",
     "experiments": {
       "tsconfigPaths": true
