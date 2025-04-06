@@ -1,4 +1,9 @@
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  FirebaseAuthTypes,
+  getAuth,
+  signInWithEmailAndPassword,
+} from '@react-native-firebase/auth';
 import db from '@react-native-firebase/database';
 import { useState } from 'react';
 import { Button, Input } from 'react-native-magnus';
@@ -20,17 +25,35 @@ export const LoginScreen = () => {
     await db().ref(`/users/${credential.user.uid}`).set({ email: credential.user.email });
   };
 
-  const register = async () => {
-    try {
-      if (email && password) {
-        const parsedEmail = emailSchema.parse(email);
-
-        const response = await auth().createUserWithEmailAndPassword(parsedEmail, password);
-
+  const tryLogin = (email: string, password: string) => {
+    signInWithEmailAndPassword(getAuth(), email, password)
+      .then(async (response) => {
         await createInitialDBEntry(response);
-      }
-    } catch (e) {
-      console.error(e);
+      })
+      .catch(() => {
+        console.error('Login not successful.');
+      });
+  };
+
+  const register = async () => {
+    if (email && password) {
+      const parsedEmail = emailSchema.parse(email);
+      createUserWithEmailAndPassword(getAuth(), parsedEmail, password)
+        .then(async (response) => await createInitialDBEntry(response))
+        .catch((e) => {
+          const key = e.message.split('[')[1].split(']')[0];
+          switch (key) {
+            case 'auth/email-already-in-use':
+              tryLogin(parsedEmail, password);
+              break;
+            case 'auth/invalid-email':
+              console.log('invalid mail');
+              break;
+            case 'auth/ weak-password':
+              console.log('weak password');
+              break;
+          }
+        });
     }
   };
 
