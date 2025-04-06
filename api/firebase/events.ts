@@ -5,6 +5,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   getFirestore,
   updateDoc,
 } from '@react-native-firebase/firestore';
@@ -21,19 +22,19 @@ type EventOperations = {
   createEvent: (data: Partial<EventData>) => Promise<void>;
   joinEvent: (id: string) => Promise<void>;
   leaveEvent: (id: string) => Promise<void>;
-  getEventData: (id: string) => Promise<EventData>;
+  getEventData: (id: string) => Promise<EventData | undefined>;
 };
 
 export const eventOperations: EventOperations = {
   createEvent: async (data) => {
     const userId = getAuth().currentUser?.uid;
     if (userId) {
-      await addDoc(collection(getFirestore(), 'events'), {
+      const result = await addDoc(collection(getFirestore(), 'events'), {
         ...data,
       });
 
       updateDoc(doc(getFirestore(), 'users', userId), {
-        admin_event_ids: arrayUnion(userId),
+        adminEventIds: arrayUnion(result.id),
       }).catch((e) => console.log(e));
     }
   },
@@ -42,12 +43,12 @@ export const eventOperations: EventOperations = {
     if (!userId) {
       return;
     }
-    const possibleEvent = await collection(getFirestore(), 'events').doc(eventId).get();
+    const possibleEvent = await getDoc(collection(getFirestore(), 'events').doc(eventId));
     if (!possibleEvent.exists) {
       return;
     }
     await updateDoc(doc(getFirestore(), 'users', userId), {
-      admin_event_ids: arrayUnion(eventId),
+      adminEventIds: arrayUnion(eventId),
     }).catch((e) => console.log(e));
   },
   leaveEvent: async (eventId) => {
@@ -57,10 +58,16 @@ export const eventOperations: EventOperations = {
     }
 
     await updateDoc(doc(getFirestore(), 'users', userId), {
-      admin_event_ids: arrayRemove(eventId),
+      adminEventIds: arrayRemove(eventId),
     }).catch((e) => console.log(e));
   },
   getEventData: async (eventId) => {
-    return Promise.resolve({ id: eventId, name: 'Event 1' });
+    const eventSnapshot = await getDoc(doc(getFirestore(), 'events', eventId));
+
+    if (eventSnapshot.exists) {
+      return eventDataSchema.parse({ id: eventId, ...eventSnapshot.data() });
+    }
+
+    return undefined;
   },
 };

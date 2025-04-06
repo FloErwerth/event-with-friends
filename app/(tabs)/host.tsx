@@ -1,8 +1,11 @@
-import { useEventsQuery } from "../../api/query/events";
-import { View } from "../../components/View";
-import { AdminEvent } from "../../components/AdminEvent";
-import { Text } from "react-native-magnus";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator } from 'react-native';
+import { Text } from 'react-native-magnus';
+
+import { useEventsQuery } from '../../api/query/events';
+import { AdminEvent } from '../../components/AdminEvent';
+import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
+import { View } from '../../components/View';
+import { EventCreationSheet } from '../../screens/EventCreation';
 
 export default function Host() {
   const { data, isLoading } = useEventsQuery();
@@ -11,16 +14,20 @@ export default function Host() {
     return <ActivityIndicator />;
   }
 
-  if (!data?.adminEvents || data.adminEvents.length === 0) {
-    return null;
-  }
+  const mappedEvents = data?.adminEvents.map((data) => {
+    if (!data) {
+      return null;
+    }
+    return <AdminEvent key={data.id} data={data} />;
+  });
 
   return (
-    <View bg="grey" p="md">
-      <Text>Deine veranstalteten Events</Text>
-      {data.adminEvents.map((data) => (
-        <AdminEvent key={data.id} data={data} />
-      ))}
-    </View>
+    <ScreenContainer enableGoBack={false}>
+      <View>
+        <Text>Deine veranstalteten Events</Text>
+        {mappedEvents}
+      </View>
+      <EventCreationSheet />
+    </ScreenContainer>
   );
 }

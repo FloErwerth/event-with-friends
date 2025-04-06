@@ -1,11 +1,22 @@
 import { getAuth } from '@react-native-firebase/auth';
-import { doc, getFirestore, setDoc } from '@react-native-firebase/firestore';
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  setDoc,
+  where,
+} from '@react-native-firebase/firestore';
 import { z } from 'zod';
 
 const userDataSchema = z.object({
   id: z.string(),
   email: z.string(),
+  adminEventIds: z.array(z.string()).optional().catch([]),
+  eventIds: z.array(z.string()).optional().catch([]),
 });
+
 type UserData = z.infer<typeof userDataSchema>;
 
 type UserOperations = {
@@ -27,9 +38,23 @@ export const userOperations: UserOperations = {
     if (!userId) {
       throw new Error('Not logged in');
     }
+    const usersRef = collection(getFirestore(), 'users');
 
-    const adminEvents = ['admin_event_id_1'];
-    const participationEvents = ['event_id_1', 'event_id_2'];
-    return Promise.resolve({ adminEventIds: adminEvents, eventIds: participationEvents });
+    const userData = await getDocs(query(usersRef, where('id', '==', userId)));
+    const adminIds: string[] = [];
+    const eventIds: string[] = [];
+
+    userData.forEach((doc) => {
+      const parsedUserData = userDataSchema.safeParse(doc.data());
+      if (parsedUserData.success) {
+        adminIds.push(...(parsedUserData.data.adminEventIds ?? []));
+        eventIds.push(...(parsedUserData.data.eventIds ?? []));
+      }
+    });
+
+    return {
+      adminEventIds: adminIds,
+      eventIds,
+    };
   },
 };

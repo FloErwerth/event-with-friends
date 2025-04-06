@@ -1,6 +1,6 @@
-import { Redirect, Tabs } from "expo-router";
-import React from "react";
-import { getAuth } from "@react-native-firebase/auth";
+import { getAuth } from '@react-native-firebase/auth';
+import { Redirect, Tabs } from 'expo-router';
+import React from 'react';
 
 const screenOptions = {
   tabBarStyle: { borderTopLeftRadius: 6, borderTopRightRadius: 6 },
@@ -10,8 +10,8 @@ const screenOptions = {
 export default function TabsLayout() {
   const user = getAuth().currentUser;
 
-  if(!user) {
-    return <Redirect href="authentication" />
+  if (!user) {
+    return <Redirect href="authentication" />;
   }
 
   return (
@@ -26,7 +26,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="host"
         options={{
-          title: 'Host'
+          title: 'Host',
         }}
       />
     </Tabs>

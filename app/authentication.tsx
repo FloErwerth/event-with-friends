@@ -1,15 +1,16 @@
-import { useState } from "react";
-import { userOperations } from "../api/firebase";
 import {
   createUserWithEmailAndPassword,
   FirebaseAuthTypes,
   getAuth,
-  signInWithEmailAndPassword
-} from "@react-native-firebase/auth";
-import { ScreenContainer } from "../components/ScreenContainer/ScreenContainer";
-import { Button, Input } from "react-native-magnus";
-import { View } from "../components/View";
-import { z } from "zod";
+  signInWithEmailAndPassword,
+} from '@react-native-firebase/auth';
+import { useState } from 'react';
+import { Button, Input } from 'react-native-magnus';
+import { z } from 'zod';
+
+import { userOperations } from '../api/firebase';
+import { ScreenContainer } from '../components/ScreenContainer/ScreenContainer';
+import { View } from '../components/View';
 
 const emailSchema = z.string().email().trim();
 

@@ -16,12 +16,17 @@ export const NormalEventList = () => {
     return null;
   }
 
+  const mappedEvents = data?.normalEvents.map((data) => {
+    if (!data || data.id) {
+      return null;
+    }
+    return <Event key={data?.id} data={data} />;
+  });
+
   return (
     <View gap={8}>
       <Text>Deine Events</Text>
-      {data.normalEvents.map((data) => (
-        <Event key={data.id} data={data} />
-      ))}
+      {mappedEvents}
     </View>
   );
 };

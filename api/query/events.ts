@@ -7,9 +7,6 @@ export const useEventsQuery = () => {
     queryFn: async () => {
       const events = await userOperations.getEventIDs();
 
-      if (events.eventIds.length === 0 || events.adminEventIds.length === 0) {
-        return { adminEvents: [], normalEvents: [] };
-      }
       const adminEvents = await Promise.all(events.adminEventIds.map(eventOperations.getEventData));
       const normalEvents = await Promise.all(events.eventIds.map(eventOperations.getEventData));
 
