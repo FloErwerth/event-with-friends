@@ -1,6 +1,7 @@
-import auth from '@react-native-firebase/auth';
+import { FirebaseAuthTypes, getAuth } from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { defaultTheme, ThemeProvider, ThemeType } from 'react-native-magnus';
 
@@ -106,7 +107,25 @@ const theme: ThemeType = {
 };
 
 export default function RootStack() {
-  const isAuthenticated = auth().currentUser !== null;
+  const [initializing, setInitializing] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Handle user state changes
+  function handleAuthStateChange(user: FirebaseAuthTypes.User | null) {
+    if (user !== null) {
+      setIsAuthenticated(true);
+    }
+    if (initializing) {
+      setInitializing(false);
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = getAuth().onAuthStateChanged(handleAuthStateChange);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <NavigationContainer>

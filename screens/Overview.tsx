@@ -1,3 +1,4 @@
+import { getDatabase, ref } from '@react-native-firebase/database';
 import { StackScreenProps } from '@react-navigation/stack';
 import { StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-magnus';
@@ -6,6 +7,7 @@ import { ScreenContainer } from '../components/ScreenContainer/ScreenContainer';
 import { View } from '../components/View';
 import { RootStackParamList } from '../navigation';
 
+const db = getDatabase();
 type OverviewProps = StackScreenProps<RootStackParamList, 'Overview'>;
 
 export default function Overview({ navigation: { navigate } }: OverviewProps) {
@@ -19,6 +21,16 @@ export default function Overview({ navigation: { navigate } }: OverviewProps) {
         <Button
           m="auto"
           onPress={() => navigate('CreateEvent')}
+          rounded="circle"
+          px="lg"
+          fontSize="xl"
+          p="md">
+          Event erstellen
+        </Button>
+
+        <Button
+          m="auto"
+          onPress={() => ref(db, '/users/test').set({ name: 'Name' })}
           rounded="circle"
           px="lg"
           fontSize="xl"

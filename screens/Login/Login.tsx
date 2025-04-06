@@ -1,17 +1,18 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import db from '@react-native-firebase/database';
 import { useState } from 'react';
 import { Button, Input } from 'react-native-magnus';
 import { z } from 'zod';
 
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
 import { View } from '../../components/View';
-import db from '../../firebase';
 
 const emailSchema = z.string().email().trim();
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const createInitialDBEntry = async (credential: FirebaseAuthTypes.UserCredential) => {
     if (!credential.user) {
       throw new Error('User was not created successfully.');

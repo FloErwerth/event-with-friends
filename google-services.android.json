@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "347982419209",
+    "firebase_url": "https://events-with-friends-9e33b-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "events-with-friends-9e33b",
     "storage_bucket": "events-with-friends-9e33b.firebasestorage.app"
   },
