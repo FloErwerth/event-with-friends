@@ -6,7 +6,11 @@ import { SingleChange } from 'react-native-ui-datepicker/lib/typescript/types';
 
 import { View } from '../View';
 
-export const Calendar = () => {
+type CalendarProps = {
+  onDateSelected: (date: Date) => void;
+};
+
+export const Calendar = ({ onDateSelected }: CalendarProps) => {
   const defaultStyles = useDefaultStyles();
   const [date, setDate] = useState<Date>();
   const [displayDate, setDisplayDate] = useState<Date>();
@@ -28,6 +32,9 @@ export const Calendar = () => {
   const handleConfirm = () => {
     setShowCalendar(false);
     setDisplayDate(date);
+    if (date) {
+      onDateSelected(date);
+    }
   };
 
   const handleCancel = () => {
@@ -43,7 +50,7 @@ export const Calendar = () => {
         onPress={() => setShowCalendar(true)}
         w="100%"
         p="md"
-        bg="white">
+        bg="gray200">
         <View flexDir="row" justifyContent="space-between" w="100%">
           <Text>{displayDate?.toISOString() ?? 'Zeitpunkt auswählen'}</Text>
           <Clock3 />

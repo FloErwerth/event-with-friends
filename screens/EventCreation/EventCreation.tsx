@@ -13,6 +13,7 @@ export const EventCreationSheet = () => {
   const { bottomSheetRef, openSheet, closeSheet } = useBottomSheetControls();
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
+  const [date, setDate] = useState<Date>();
   const [description, setDescription] = useState('');
 
   const pickImage = async () => {
@@ -30,8 +31,10 @@ export const EventCreationSheet = () => {
   };
 
   const handleCreateEvent = async () => {
-    if (name) {
-      eventOperations.createEvent({ name }).then(closeSheet);
+    if (name && date && location) {
+      eventOperations
+        .createEvent({ name, dateTimestamp: date.valueOf(), description, address: location })
+        .then(closeSheet);
     }
   };
 
@@ -41,31 +44,40 @@ export const EventCreationSheet = () => {
         Event erstellen
       </Button>
       <BottomSheet
-        title="Dein neues Event"
+        title="Neues Event veranstalten"
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         reference={bottomSheetRef}>
-        <Input onChangeText={setName} placeholder="Eventname" variant="medium" />
-        <Input onChangeText={setLocation} placeholder="Ort" variant="medium" suffix={<MapPin />} />
-        <Calendar />
-        <Button borderColor="transparent" onPress={pickImage} w="100%" p="md" bg="white">
-          <Text>Bild hochladen</Text>
-        </Button>
-        <Input
-          placeholder="Beschreibung"
-          variant="medium"
-          onChangeText={setDescription}
-          numberOfLines={8}
-          textAlignVertical="top"
-          multiline
-          p={4}
-        />
-        <View flex={1} />
-        <Button w="100%" py="md" px="lg" onPress={handleCreateEvent}>
-          <Text color="white" variant="lg">
-            Erstellen
-          </Text>
-        </Button>
+        <View gap={16} flex={1}>
+          <Input bg="gray200" onChangeText={setName} placeholder="Eventname" variant="medium" />
+          <Input
+            bg="gray200"
+            onChangeText={setLocation}
+            placeholder="Ort"
+            variant="medium"
+            suffix={<MapPin />}
+          />
+          <Calendar onDateSelected={setDate} />
+          {/*<Button bg="gray200" borderColor="transparent" onPress={pickImage} w="100%" p="md">
+            <Text>Bild hochladen</Text>
+          </Button>*/}
+          <Input
+            bg="gray200"
+            placeholder="Beschreibung"
+            variant="medium"
+            onChangeText={setDescription}
+            numberOfLines={8}
+            textAlignVertical="top"
+            multiline
+            p={4}
+          />
+          <View flex={1} />
+          <Button w="100%" py="md" px="lg" onPress={handleCreateEvent}>
+            <Text color="white" variant="lg">
+              Erstellen
+            </Text>
+          </Button>
+        </View>
       </BottomSheet>
     </>
   );

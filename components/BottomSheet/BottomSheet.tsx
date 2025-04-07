@@ -9,7 +9,7 @@ import { ScreenContainer } from '../ScreenContainer/ScreenContainer';
 
 const Backdrop = ({ animatedIndex }: BottomSheetBackdropProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: 'rgb(100,100,100,0.5)',
+    backgroundColor: 'black',
     position: 'absolute',
     width: '100%',
     height: '100%',
@@ -35,7 +35,7 @@ export const BottomSheet = ({
   const Header = () => {
     if (enablePanDownToClose) {
       return (
-        <View>
+        <View p="lg" pt="xl">
           <Text fontSize="xl" fontFamily="Bold">
             {title}
           </Text>
@@ -44,7 +44,7 @@ export const BottomSheet = ({
     }
     return (
       <>
-        <View flexDir="row" justifyContent="space-between" p="md">
+        <View flexDir="row" justifyContent="space-between" p="lg" pt="xl">
           <Text fontSize="xl" fontFamily="Bold">
             {title}
           </Text>
