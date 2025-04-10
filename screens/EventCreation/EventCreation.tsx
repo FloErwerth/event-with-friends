@@ -3,7 +3,7 @@ import { MapPin } from 'lucide-react-native';
 import { useState } from 'react';
 import { Button, Input, Text } from 'react-native-magnus';
 
-import { eventOperations } from '../../api/firebase';
+import { useCreateEventMutation } from '../../api/query/events';
 import { BottomSheet, useBottomSheetControls } from '../../components/BottomSheet';
 import { Calendar } from '../../components/Calendar/Calendar';
 import { View } from '../../components/View';
@@ -12,9 +12,12 @@ export const EventCreationSheet = () => {
   const [image, setImage] = useState<string | null>(null);
   const { bottomSheetRef, openSheet, closeSheet } = useBottomSheetControls();
   const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
+  const [streetHouseNr, setStreetHouseNr] = useState('');
+  const [zipCity, setZipCity] = useState('');
   const [date, setDate] = useState<Date>();
   const [description, setDescription] = useState('');
+
+  const { mutateAsync: createEvent } = useCreateEventMutation();
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -32,9 +35,12 @@ export const EventCreationSheet = () => {
 
   const handleCreateEvent = async () => {
     if (name && date && location) {
-      eventOperations
-        .createEvent({ name, dateTimestamp: date.valueOf(), description, address: location })
-        .then(closeSheet);
+      createEvent({
+        name,
+        dateTimestamp: date.valueOf(),
+        description,
+        address: { streetHouseNr, zipCity },
+      }).then(closeSheet);
     }
   };
 
@@ -50,13 +56,24 @@ export const EventCreationSheet = () => {
         reference={bottomSheetRef}>
         <View gap={16} flex={1}>
           <Input bg="gray200" onChangeText={setName} placeholder="Eventname" variant="medium" />
-          <Input
-            bg="gray200"
-            onChangeText={setLocation}
-            placeholder="Ort"
-            variant="medium"
-            suffix={<MapPin />}
-          />
+          <View flexDir="row" gap={8}>
+            <Input
+              flex={1}
+              bg="gray200"
+              onChangeText={setStreetHouseNr}
+              placeholder="Strasse, Nr."
+              variant="medium"
+              suffix={<MapPin />}
+            />
+            <Input
+              flex={1}
+              bg="gray200"
+              onChangeText={setZipCity}
+              placeholder="Plz, Ort"
+              variant="medium"
+              suffix={<MapPin />}
+            />
+          </View>
           <Calendar onDateSelected={setDate} />
           {/*<Button bg="gray200" borderColor="transparent" onPress={pickImage} w="100%" p="md">
             <Text>Bild hochladen</Text>

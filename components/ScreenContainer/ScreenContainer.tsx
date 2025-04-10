@@ -1,10 +1,11 @@
-import { ChevronLeft } from "lucide-react-native";
-import { PropsWithChildren } from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
-import { Button, Text } from "react-native-magnus";
-import { router } from "expo-router";
+import { router } from 'expo-router';
+import { ChevronLeft } from 'lucide-react-native';
+import { PropsWithChildren } from 'react';
+import { StyleSheet } from 'react-native';
+import { Button, Text } from 'react-native-magnus';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { View } from "../View";
+import { View } from '../View';
 
 const styles = StyleSheet.create({
   safeAreaView: {
@@ -18,7 +19,6 @@ type ScreenContainerProps = {
 } & PropsWithChildren;
 
 export const ScreenContainer = ({ children, title, enableGoBack = true }: ScreenContainerProps) => {
-
   const Header = () => {
     if (!title && !enableGoBack) {
       return null;

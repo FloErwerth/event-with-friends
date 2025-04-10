@@ -1,76 +1,63 @@
-import { Clock3 } from 'lucide-react-native';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Calendar1, Clock3 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Button, Overlay, Text } from 'react-native-magnus';
-import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
-import { SingleChange } from 'react-native-ui-datepicker/lib/typescript/types';
+import { Button, Text } from 'react-native-magnus';
 
+import { formatToDate, formatToTime } from '../../utils';
 import { View } from '../View';
 
 type CalendarProps = {
-  onDateSelected: (date: Date) => void;
+  onDateSelected: (date?: Date) => void;
 };
 
 export const Calendar = ({ onDateSelected }: CalendarProps) => {
-  const defaultStyles = useDefaultStyles();
-  const [date, setDate] = useState<Date>();
-  const [displayDate, setDisplayDate] = useState<Date>();
+  const [date, setDate] = useState<Date>(new Date());
+  const [calendarMode, setCalendarMode] = useState<'date' | 'time'>('date');
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const handleSetDate: SingleChange = ({ date }) => {
-    if (!date) {
-      return;
-    }
-
-    const selectedDate = new Date(date.valueOf());
-    setDate(selectedDate);
+  const handleShowCalendar = () => {
+    setCalendarMode('date');
+    setShowCalendar(true);
   };
 
-  const closeCalendar = () => {
-    setShowCalendar(false);
+  const handleShowTime = () => {
+    setCalendarMode('time');
+    setShowCalendar(true);
   };
 
-  const handleConfirm = () => {
+  const handleSelectDate = (event: DateTimePickerEvent, date?: Date) => {
     setShowCalendar(false);
-    setDisplayDate(date);
-    if (date) {
+    if (event.type === 'set' && date !== undefined) {
       onDateSelected(date);
+      setDate(date);
     }
-  };
-
-  const handleCancel = () => {
-    setShowCalendar(false);
-    setDate(undefined);
-    setDisplayDate(undefined);
   };
 
   return (
     <View>
-      <Button
-        borderColor="transparent"
-        onPress={() => setShowCalendar(true)}
-        w="100%"
-        p="md"
-        bg="gray200">
-        <View flexDir="row" justifyContent="space-between" w="100%">
-          <Text>{displayDate?.toISOString() ?? 'Zeitpunkt auswählen'}</Text>
-          <Clock3 />
-        </View>
-      </Button>
-      <Overlay visible={showCalendar} onBackdropPress={closeCalendar}>
-        <DateTimePicker mode="single" date={date} onChange={handleSetDate} styles={defaultStyles} />
-        <View flexDir="row" justifyContent="space-between">
-          <Button p="md" variant="secondary" onPress={handleCancel}>
-            <Text variant="sm" color="blue700">
-              Abbrechen
-            </Text>
-          </Button>
-          <Button p="md" borderWidth={1} borderColor="blue600" onPress={handleConfirm}>
-            <Text variant="sm" color="white">
-              Bestätigen
-            </Text>
-          </Button>
-        </View>
-      </Overlay>
+      <View flexDir="row" gap={8}>
+        <Button flex={1} borderColor="transparent" onPress={handleShowCalendar} p="md" bg="gray200">
+          <View flexDir="row" justifyContent="space-between">
+            <Text flex={1}>{formatToDate(date) ?? 'Zeitpunkt auswählen'}</Text>
+            <Calendar1 />
+          </View>
+        </Button>
+        <Button flex={1} borderColor="transparent" onPress={handleShowTime} p="md" bg="gray200">
+          <View flexDir="row" justifyContent="space-between">
+            <Text flex={1}>{formatToTime(date)}</Text>
+            <Clock3 />
+          </View>
+        </Button>
+      </View>
+      {showCalendar && (
+        <DateTimePicker
+          locale="de-DE"
+          is24Hour
+          onChange={handleSelectDate}
+          mode={calendarMode}
+          value={date}
+        />
+      )}
     </View>
   );
 };
