@@ -1,7 +1,7 @@
 import { ActivityIndicator, SectionList } from 'react-native';
 import { Text } from 'react-native-magnus';
 
-import { useEventsQuery } from '../../api/query/events/events';
+import { useEventsQuery } from '../../api/query/events';
 import { AdminEvent } from '../../components/AdminEvent';
 import { View } from '../../components/View';
 import { EventCreationSheet } from '../../screens/EventCreation';
