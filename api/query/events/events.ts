@@ -12,10 +12,9 @@ import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { EventData, eventDataSchema } from './types';
-import { userOperations } from '../../firebase';
+import { queryKeys } from '../queryKeys';
+import { useUserEventIdsQuery } from '../user';
 
-const CREATE_EVENT_MUTATION_KEY = 'CREATE_EVENT_MUTATION_KEY';
-const EVENT_QUERY_KEY = 'EVENT_QUERY_KEY';
 const mapEvents = (data: (EventData | undefined)[]) =>
   data
     .sort((eventA, eventB) => {
@@ -60,12 +59,16 @@ const getEventData = async (eventId: string) => {
 };
 
 export const useEventsQuery = () => {
+  const { data: eventIds, isLoading: isLoadingEventIds } = useUserEventIdsQuery();
+
   return useQuery({
     queryFn: async () => {
-      const events = await userOperations.getEventIDs();
+      if (!eventIds || isLoadingEventIds) {
+        return { adminEvents: [], normalEvents: [] };
+      }
 
-      const adminEvents = await Promise.all(events.adminEventIds.map(getEventData));
-      const normalEvents = await Promise.all(events.eventIds.map(getEventData));
+      const adminEvents = await Promise.all(eventIds.adminEventIds.map(getEventData));
+      const normalEvents = await Promise.all(eventIds.eventIds.map(getEventData));
 
       const sortedAdminEvents = mapEvents(adminEvents);
       const sortedNormalEvents = mapEvents(normalEvents);
@@ -75,7 +78,7 @@ export const useEventsQuery = () => {
         normalEvents: sortedNormalEvents,
       };
     },
-    queryKey: [EVENT_QUERY_KEY],
+    queryKey: [queryKeys.EVENTS.EVENT_QUERY_KEY],
   });
 };
 
@@ -97,9 +100,10 @@ export const useCreateEventMutation = () => {
 
   return useMutation({
     mutationFn: doCreateEvent,
-    mutationKey: [CREATE_EVENT_MUTATION_KEY],
+    mutationKey: [queryKeys.EVENTS.CREATE_EVENT_MUTATION_KEY],
     onSuccess: () => {
-      void queryClient.invalidateQueries([EVENT_QUERY_KEY]);
+      void queryClient.invalidateQueries([queryKeys.USER.EVENT_IDS_QUERY_KEY]);
+      void queryClient.invalidateQueries([queryKeys.EVENTS.EVENT_QUERY_KEY]);
     },
   });
 };
