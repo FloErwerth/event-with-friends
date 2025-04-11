@@ -2,7 +2,7 @@ import { ActivityIndicator, SectionList } from 'react-native';
 import { Text } from 'react-native-magnus';
 
 import { useEventsQuery } from '../../api/query/events';
-import { AdminEvent } from '../../components/AdminEvent';
+import { Event } from '../../components/Event';
 import { View } from '../../components/View';
 import { EventCreationSheet } from '../../screens/EventCreation';
 import { formatToDate } from '../../utils';
@@ -19,19 +19,21 @@ export default function Host() {
   }
 
   return (
-    <View>
+    <View flex={1}>
       <SectionList
+        style={{ flex: 1 }}
         sections={data.adminEvents}
-        contentContainerStyle={{ gap: 16, margin: 16 }}
-        renderSectionHeader={({ section: { title } }) => (
-          <View flexDir="row" gap={4} pt={16}>
-            <Text fontSize="lg" fontFamily="Bold">
-              {formatToDate(title)}
-            </Text>
-            <Text>in 2 Tagen</Text>
-          </View>
-        )}
-        renderItem={(data) => <AdminEvent key={data.item.id} data={data.item} />}
+        contentContainerStyle={{ gap: 8, margin: 16 }}
+        renderSectionHeader={({ section: { title } }) => {
+          return (
+            <View flexDir="row" gap={4} pt={16}>
+              <Text fontSize="lg" fontFamily="Bold">
+                {formatToDate(title)}
+              </Text>
+            </View>
+          );
+        }}
+        renderItem={(data) => <Event key={data.item.id} data={data.item} />}
       />
       <EventCreationSheet />
     </View>

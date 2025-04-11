@@ -5,15 +5,19 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  query,
   updateDoc,
+  where,
 } from '@react-native-firebase/firestore';
 import { useCallback } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 import { EventData, eventDataSchema } from './types';
+import { queryClient } from '../../../app/_layout';
 import { queryKeys } from '../queryKeys';
-import { useUserEventIdsQuery } from '../user';
+import { userDataSchema } from '../user';
 
 const mapEvents = (data: (EventData | undefined)[]) =>
   data
@@ -51,6 +55,7 @@ const mapEvents = (data: (EventData | undefined)[]) =>
 
 const getEventData = async (eventId: string) => {
   const eventSnapshot = await getDoc(doc(getFirestore(), 'events', eventId));
+
   if (eventSnapshot.exists) {
     return eventDataSchema.parse({ id: eventId, ...eventSnapshot.data() });
   }
@@ -59,16 +64,29 @@ const getEventData = async (eventId: string) => {
 };
 
 export const useEventsQuery = () => {
-  const { data: eventIds, isLoading: isLoadingEventIds } = useUserEventIdsQuery();
-
   return useQuery({
     queryFn: async () => {
-      if (!eventIds || isLoadingEventIds) {
-        return { adminEvents: [], normalEvents: [] };
+      const userId = getAuth().currentUser?.uid;
+      if (!userId) {
+        throw new Error('Not logged in');
       }
 
-      const adminEvents = await Promise.all(eventIds.adminEventIds.map(getEventData));
-      const normalEvents = await Promise.all(eventIds.eventIds.map(getEventData));
+      const usersRef = collection(getFirestore(), 'users');
+      const userData = await getDocs(query(usersRef, where('id', '==', userId)));
+      const adminIds: string[] = [];
+      const eventIds: string[] = [];
+
+      userData.forEach((doc) => {
+        const parsedUserData = userDataSchema.safeParse(doc.data());
+
+        if (parsedUserData.success) {
+          adminIds.push(...(parsedUserData.data.adminEventIds ?? []));
+          eventIds.push(...(parsedUserData.data.eventIds ?? []));
+        }
+      });
+
+      const adminEvents = await Promise.all(adminIds.map(getEventData));
+      const normalEvents = await Promise.all(eventIds.map(getEventData));
 
       const sortedAdminEvents = mapEvents(adminEvents);
       const sortedNormalEvents = mapEvents(normalEvents);
@@ -82,8 +100,32 @@ export const useEventsQuery = () => {
   });
 };
 
+export const useJoinEventsMutation = () => {
+  const joinEvent = async (eventId: string) => {
+    const userId = getAuth().currentUser?.uid;
+    if (!userId) {
+      return;
+    }
+    const possibleEvent = await getDoc(collection(getFirestore(), 'events').doc(eventId));
+    if (!possibleEvent.exists) {
+      return;
+    }
+    await updateDoc(doc(getFirestore(), 'users', userId), {
+      eventIds: arrayUnion(eventId),
+    }).catch((e) => console.log(e));
+  };
+
+  return useMutation({
+    mutationFn: joinEvent,
+    mutationKey: [queryKeys.EVENTS.JOIN_EVENT_MUTATION_KEY],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.USER.EVENT_IDS_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.EVENTS.EVENT_QUERY_KEY });
+    },
+  });
+};
+
 export const useCreateEventMutation = () => {
-  const queryClient = useQueryClient();
   const doCreateEvent = useCallback(async (data: EventData) => {
     const userId = getAuth().currentUser?.uid;
 
@@ -101,9 +143,9 @@ export const useCreateEventMutation = () => {
   return useMutation({
     mutationFn: doCreateEvent,
     mutationKey: [queryKeys.EVENTS.CREATE_EVENT_MUTATION_KEY],
-    onSuccess: () => {
-      void queryClient.invalidateQueries([queryKeys.USER.EVENT_IDS_QUERY_KEY]);
-      void queryClient.invalidateQueries([queryKeys.EVENTS.EVENT_QUERY_KEY]);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.USER.EVENT_IDS_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.EVENTS.EVENT_QUERY_KEY });
     },
   });
 };

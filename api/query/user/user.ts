@@ -1,17 +1,9 @@
 import { getAuth } from '@react-native-firebase/auth';
-import {
-  collection,
-  doc,
-  getDocs,
-  getFirestore,
-  query,
-  setDoc,
-  where,
-} from '@react-native-firebase/firestore';
-import { useCallback } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { doc, getFirestore, setDoc } from '@react-native-firebase/firestore';
+import { useMutation } from 'react-query';
 
 import { UserData, userDataSchema } from './types';
+import { queryClient } from '../../../app/_layout';
 import { queryKeys } from '../queryKeys';
 
 const createUser = async (userData: UserData) => {
@@ -23,58 +15,31 @@ const createUser = async (userData: UserData) => {
   }
 };
 
-export const useUserEventIdsQuery = () => {
-  const getEventIds = useCallback(async () => {
-    const userId = getAuth().currentUser?.uid;
-    if (!userId) {
-      throw new Error('Not logged in');
-    }
+export const useLoginUserMutation = () => {
+  return useMutation({
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      const userCredentials = await getAuth().signInWithEmailAndPassword(
+        credentials.email,
+        credentials.password
+      );
 
-    const usersRef = collection(getFirestore(), 'users');
-    const userData = await getDocs(query(usersRef, where('id', '==', userId)));
-    const adminIds: string[] = [];
-    const eventIds: string[] = [];
-
-    userData.forEach((doc) => {
-      const parsedUserData = userDataSchema.safeParse(doc.data());
-
-      if (parsedUserData.success) {
-        adminIds.push(...(parsedUserData.data.adminEventIds ?? []));
-        eventIds.push(...(parsedUserData.data.eventIds ?? []));
+      if (!userCredentials) {
+        throw new Error('Login not possible');
       }
-    });
-
-    userData.forEach((doc) => {
-      const parsedUserData = userDataSchema.safeParse(doc.data());
-      if (parsedUserData.success) {
-        adminIds.push(...(parsedUserData.data.adminEventIds ?? []));
-        eventIds.push(...(parsedUserData.data.eventIds ?? []));
-      }
-    });
-
-    return {
-      adminEventIds: adminIds,
-      eventIds,
-    };
-  }, []);
-
-  return useQuery({
-    queryFn: getEventIds,
-    queryKey: [queryKeys.USER.EVENT_IDS_QUERY_KEY],
+    },
+    mutationKey: [queryKeys.USER.LOGIN_USER_MUTATION_KEY],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.EVENTS.EVENT_QUERY_KEY });
+    },
   });
 };
 
-export const useLoginUserQuery = () => {
-
-}
-
 export const useCreateUserMutation = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createUser,
     mutationKey: [queryKeys.USER.CREATE_USER_MUTATION_KEY],
-    onSuccess: () => {
-      void queryClient.invalidateQueries([queryKeys.EVENTS.EVENT_QUERY_KEY]);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.EVENTS.EVENT_QUERY_KEY });
     },
   });
 };

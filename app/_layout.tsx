@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { defaultTheme, ThemeProvider, ThemeType } from 'react-native-magnus';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-const client = new QueryClient();
+export const queryClient = new QueryClient();
 
 const theme: ThemeType = {
   ...defaultTheme,
@@ -116,7 +116,7 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={client}>
+    <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <GestureHandlerRootView>
           <BottomSheetModalProvider>

@@ -1,13 +1,9 @@
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-} from '@react-native-firebase/auth';
+import { createUserWithEmailAndPassword, getAuth } from '@react-native-firebase/auth';
 import { useState } from 'react';
 import { Button, Input } from 'react-native-magnus';
 import { z } from 'zod';
 
-import { useCreateUserMutation } from '../api/query/user';
+import { useCreateUserMutation, useLoginUserMutation } from '../api/query/user';
 import { ScreenContainer } from '../components/ScreenContainer/ScreenContainer';
 import { View } from '../components/View';
 
@@ -17,16 +13,7 @@ export default function Authentication() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { mutate: createUser } = useCreateUserMutation();
-
-  const tryLogin = (email: string, password: string) => {
-    signInWithEmailAndPassword(getAuth(), email, password)
-      .then((response) => {
-        createUser({ id: response.user.uid, email });
-      })
-      .catch(() => {
-        console.error('Login not successful.');
-      });
-  };
+  const { mutate: loginUser } = useLoginUserMutation();
 
   const register = async () => {
     if (email && password) {
@@ -37,7 +24,7 @@ export default function Authentication() {
           const key = e.message.split('[')[1].split(']')[0];
           switch (key) {
             case 'auth/email-already-in-use':
-              tryLogin(parsedEmail, password);
+              loginUser({ email: parsedEmail, password });
               break;
             case 'auth/invalid-email':
               console.log('invalid mail');
