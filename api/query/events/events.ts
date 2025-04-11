@@ -103,6 +103,7 @@ export const useEventsQuery = () => {
 export const useJoinEventsMutation = () => {
   const joinEvent = async (eventId: string) => {
     const userId = getAuth().currentUser?.uid;
+    console.log('userId: ', userId, 'eventId: ', eventId);
     if (!userId) {
       return;
     }
@@ -110,6 +111,7 @@ export const useJoinEventsMutation = () => {
     if (!possibleEvent.exists) {
       return;
     }
+
     await updateDoc(doc(getFirestore(), 'users', userId), {
       eventIds: arrayUnion(eventId),
     }).catch((e) => console.log(e));
