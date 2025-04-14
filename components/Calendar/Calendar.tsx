@@ -7,11 +7,11 @@ import { formatToDate, formatToTime } from '../../utils';
 import { View } from '../View';
 
 type CalendarProps = {
-  onDateSelected: (date?: Date) => void;
+  onDateSelected: (date: Date) => void;
+  date: Date;
 };
 
-export const Calendar = ({ onDateSelected }: CalendarProps) => {
-  const [date, setDate] = useState<Date>(new Date());
+export const Calendar = ({ date, onDateSelected }: CalendarProps) => {
   const [calendarMode, setCalendarMode] = useState<'date' | 'time'>('date');
   const [showCalendar, setShowCalendar] = useState(false);
 
@@ -29,7 +29,6 @@ export const Calendar = ({ onDateSelected }: CalendarProps) => {
     setShowCalendar(false);
     if (event.type === 'set' && date !== undefined) {
       onDateSelected(date);
-      setDate(date);
     }
   };
 

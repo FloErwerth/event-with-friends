@@ -136,9 +136,11 @@ export const useCreateEventMutation = () => {
         ...data,
       });
 
-      return updateDoc(doc(getFirestore(), 'users', userId), {
+      await updateDoc(doc(getFirestore(), 'users', userId), {
         adminEventIds: arrayUnion(result.id),
       });
+
+      return result.id;
     }
   }, []);
 

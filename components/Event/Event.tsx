@@ -1,8 +1,12 @@
 import { EventData } from 'api/query/events';
+import { Share2 } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
+import { Pressable } from 'react-native';
 import { Text } from 'react-native-magnus';
 
+import { EventShareSheet } from '../../screens/EventCreation/EventShareSheet';
 import { calcTimeUntilDate, formatToTime } from '../../utils';
+import { useBottomSheetControls } from '../BottomSheet';
 import { Card } from '../Card';
 import { View } from '../View';
 
@@ -61,13 +65,25 @@ const TimeUntilDisplay = ({ timestamp }: { timestamp: number }) => {
   return <Text>{timeString}</Text>;
 };
 
-export const Event = ({ data: { name, dateTimestamp, address } }: { data: EventData }) => {
+export const Event = ({
+  data: { id, name, dateTimestamp, address },
+  isAdmin,
+}: {
+  data: EventData;
+  isAdmin?: boolean;
+}) => {
+  const { bottomSheetRef, openSheet } = useBottomSheetControls();
+
+  const calculatedString = calcTimeUntilDate(dateTimestamp);
+  const isInPast = calculatedString === undefined;
+
   return (
     <Card flexDir="row" gap={8}>
-      <View justifyContent="center" gap={4}>
+      <View flex={1} justifyContent="center" gap={4}>
         <Text fontFamily="Bold" fontSize="md">
           {name}
         </Text>
+
         <TimeUntilDisplay timestamp={dateTimestamp} />
         <View flexDir="row" gap={4} left={-1}>
           <Text>{address.streetHouseNr},</Text>
@@ -75,6 +91,16 @@ export const Event = ({ data: { name, dateTimestamp, address } }: { data: EventD
         </View>
         <Text>{formatToTime(dateTimestamp)} Uhr</Text>
       </View>
+      {id && isAdmin && !isInPast && (
+        <>
+          <EventShareSheet eventId={id} reference={bottomSheetRef} />
+          <View bg="gray100" shadow="sm" w={32} h={32} rounded={16}>
+            <Pressable style={{ padding: 8, width: 32, height: 32 }} onPress={openSheet}>
+              <Share2 style={{ top: 1 }} size={14} />
+            </Pressable>
+          </View>
+        </>
+      )}
     </Card>
   );
 };

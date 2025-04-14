@@ -5,6 +5,7 @@ import { Button, Text } from 'react-native-magnus';
 
 import { EventData, useJoinEventsMutation } from '../../api/query/events';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
+import { View } from '../../components/View';
 
 const getEvent = async (eventId: string) => {
   return await getDoc(collection(getFirestore(), 'events').doc(eventId));
@@ -31,7 +32,11 @@ export default function JoinEvent() {
   }, [eventId]);
 
   if (!event || !eventId || typeof eventId !== 'string') {
-    return null;
+    return (
+      <View>
+        <Button onPress={() => router.replace('/')}>Nav back</Button>
+      </View>
+    );
   }
 
   return (
@@ -46,7 +51,7 @@ export default function JoinEvent() {
         }}>
         Einladung annehmen
       </Button>
-      <Button>Einladung ablehnen</Button>
+      <Button onPress={() => router.replace('/')}>Einladung ablehnen</Button>
     </ScreenContainer>
   );
 }

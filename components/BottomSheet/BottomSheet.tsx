@@ -61,14 +61,17 @@ export const BottomSheet = ({
   return (
     <BottomSheetModal
       ref={props.reference}
-      snapPoints={snapPoints}
+      snapPoints={!props.enableDynamicSizing ? snapPoints : undefined}
       enablePanDownToClose={enablePanDownToClose}
       {...props}
       {...panDownToClose}
       backdropComponent={Backdrop}>
       <BottomSheetView style={{ flex: 1 }}>
         <Header />
-        <ScreenContainer enableGoBack={false}>{children}</ScreenContainer>
+        <ScreenContainer enableGoBack={false}>
+          {children}
+          {props.enableDynamicSizing && <View h={30} />}
+        </ScreenContainer>
       </BottomSheetView>
     </BottomSheetModal>
   );

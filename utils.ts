@@ -77,7 +77,7 @@ export function calcTimeUntilDate(targetDateTimestamp: number) {
 
   if (calendarDaysDiff >= 2) {
     // If 2 or more full days away, just show days
-    return `in ${calendarDaysDiff} ${calendarDaysDiff > 1 ? 'Tag' : 'Tagen'}`;
+    return `in ${calendarDaysDiff} ${calendarDaysDiff <= 1 ? 'Tag' : 'Tagen'}`;
   }
 
   // --- Handle Today / Tomorrow with Hour/Minute Precision ---

@@ -32,6 +32,20 @@
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "events-with-friends-9e33b.web.app",
+              "pathPrefix": "/joinEvent/*"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
     "plugins": [
